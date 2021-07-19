@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLockBodyScroll, useToggle } from 'react-use'
 import { ToastContainer, Zoom } from 'react-toastify'
 import { fetchPhotos } from '../../services/api'
 import { toast } from 'react-toastify'
@@ -23,6 +24,9 @@ function App() {
   const [photos, setPhotos] = useState([])
   const [selectedImg, setSelectedImg] = useState(null)
   const [reqStatus, setReqStatus] = useState(Status.IDLE)
+  const [locked, toggleLocked] = useToggle(false)
+
+  useLockBodyScroll(locked)
 
   useEffect(() => {
     async function fetchApi() {
@@ -36,29 +40,20 @@ function App() {
 
         setPhotos((prevPhotos) => [...prevPhotos, ...photos])
         setReqStatus(Status.RESOLVED)
+
+        page > 1 &&
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth',
+          })
       } catch (error) {
         setReqStatus(Status.REJECTED)
         console.log(error)
       }
     }
 
-    function scroll() {
-      console.log('scrol timeout', Date.now())
-      setTimeout(() => {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
-        })
-      }, 0)
-    }
-
     if (query !== '') {
-      console.log('query!== ,fetch', Date.now())
       fetchApi()
-    }
-    if (page > 1) {
-      console.log('page>1,scroll', Date.now())
-      scroll()
     }
   }, [query, page])
 
@@ -74,7 +69,7 @@ function App() {
     const sameQuery = query === newQuery
 
     if (sameQuery) {
-      return
+      return toast('Please enter a new query name')
     }
 
     resetState()
@@ -87,12 +82,12 @@ function App() {
 
   const onSelectImg = (src, alt) => {
     setSelectedImg({ src, alt })
-    document.body.classList.add('modal-open')
+    toggleLocked()
   }
 
   const onModalClose = () => {
     setSelectedImg(null)
-    document.body.classList.remove('modal-open')
+    toggleLocked()
   }
 
   if (reqStatus === Status.IDLE || reqStatus === Status.REJECTED) {
@@ -110,7 +105,7 @@ function App() {
         <Searchbar onSubmit={handleSubmit} />
         <ImageGallery photos={photos} onSelectImg={onSelectImg} />
         <Spinner />
-        {photos.length > 0 && <Button onClick={onLoadMore} />}
+        {photos.length > 11 && <Button onClick={onLoadMore} />}
         <ToastContainer autoClose={2000} transition={Zoom} />
       </div>
     )
@@ -121,7 +116,7 @@ function App() {
       <div className={s.app}>
         <Searchbar onSubmit={handleSubmit} />
         <ImageGallery photos={photos} onSelectImg={onSelectImg} />
-        {photos.length > 0 && <Button onClick={onLoadMore} />}
+        {photos.length > 11 && <Button onClick={onLoadMore} />}
         {selectedImg && <Modal photo={selectedImg} onClose={onModalClose} />}
 
         <ToastContainer autoClose={2000} transition={Zoom} />

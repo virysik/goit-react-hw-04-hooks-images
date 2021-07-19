@@ -2,7 +2,7 @@
   "name": "goit-react-hw-03-image-finder",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://virysik.github.io/goit-react-hw-03-image-finder",
+  "homepage": "https://virysik.github.io/goit-react-hw-04-hooks-images",
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
@@ -16,6 +16,7 @@
     "react-loader-spinner": "^4.0.0",
     "react-scripts": "4.0.3",
     "react-toastify": "^7.0.4",
+    "react-use": "^17.2.4",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
